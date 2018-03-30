@@ -1,0 +1,7 @@
+name: slackbot
+dependencies:
+  - pip
+  - python=3.6
+  - pip:
+    - slackclient
+
