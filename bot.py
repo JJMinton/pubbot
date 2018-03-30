@@ -8,8 +8,7 @@ import config
 class Bot(object):
     def __init__(self):
         self.slack_client = SlackClient(config.bot_user_oauth_token)
-        print(config.bot_user_oauth_token)
-        self.bot_name = "starterbot"
+        self.bot_name = config.bot_name
         self.bot_id = self.get_bot_id()
 
         if self.bot_id is None:
@@ -26,9 +25,7 @@ class Bot(object):
             for user in users:
                 if 'name' in user and user.get('name') == self.bot_name:
                     return "<@" + user.get('id') + ">"
-                else:
-                   print("No id")
-                   return None
+            raise ValueError('The token does not match self.bot_name')
 
     def listen(self):
         if self.slack_client.rtm_connect(with_team_state=False):
