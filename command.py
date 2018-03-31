@@ -11,14 +11,19 @@ class Command(object):
         #    "help" : self.help
         #}
 
-    def handle_command(self, user, command):
+    def handle_command(self, user, command, channel):
 
         for word in self.trigger_keywords:
             if word in command:
                 self.trigger()
-                return ""
+                return
 
-        return "Sorry I don't understand the command"
+        reponse =  "Sorry I don't understand the command"
+        self.bot.slack_client.api_call("chat.postMessage",
+                                       channel=channel,
+                                       text=response,
+                                       as_user=True)
+        return
 
     def trigger(self):
         blog.debug("Triggered pub")
