@@ -1,4 +1,5 @@
 import command
+from loggers import blog
 
 class Event:
     def __init__(self, bot):
@@ -10,19 +11,18 @@ class Event:
 
         if events and len(events) > 0:
             for event in events:
-                print ("Triggered event")
+                blog.debug ("Triggered event")
                 self.parse_event(event)
 
     def parse_event(self, event):
         if event and 'text' in event and self.bot.bot_id in event['text']:
-            print("Inside condition")
             self.handle_event(event['user'],
                               event['text'].split(self.bot.bot_id)[1].strip().lower(),
                               event['channel'])
 
     def handle_event(self, user, command, channel):
         if command and channel:
-            print ("Received command: " + command + " in channel: "
+            blog.info("Received command: " + command + " in channel: "
                    + channel + " from user: " + user)
             response = self.command.handle_command(user, command)
             self.bot.slack_client.api_call("chat.postMessage",

@@ -1,4 +1,5 @@
 from utils import get_users
+from loggers import blog
 
 
 class Command(object):
@@ -20,20 +21,19 @@ class Command(object):
         return response
 
     def pub(self):
-        print("Triggered pub")
+        blog.debug("Triggered pub")
         for user in get_users(self.sc):
-            print(f"Username: {user.get('name')} with ID: {user.get('id')}")
+            blog.debug(f"Username: {user.get('name')} with ID: {user.get('id')}")
             channel = self.sc.api_call("conversations.open",
                                        users=[user.get('id')])
             if channel['ok']==True:
                 channelid=channel['channel']['id']
-                print(channelid)
                 self.sc.api_call("chat.postMessage",
                                  channel=channelid,
                                  text="Fancy a pint?",
                                  as_user=True)
             else:
-                print(f"Status is not ok for user: {user.get('id')}")
+                blog.warn(f"Status is not ok for user: {user.get('id')}")
         return ""
 
     def help(self):

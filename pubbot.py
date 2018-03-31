@@ -4,6 +4,7 @@ from slackclient import SlackClient
 
 import config
 from utils import get_users
+from loggers import blog
 
 class Bot(object):
     def __init__(self):
@@ -29,11 +30,12 @@ class Bot(object):
 
     def listen(self):
         if self.slack_client.rtm_connect(with_team_state=False):
-            print ("Successfully connected, listening for commands")
+            blog.info("Successfully connected, listening for commands")
             while True:
                 self.event.wait_for_event()
                 time.sleep(1)
         else:
+            blog.error("Connection failed: exiting")
             exit("Error, Connection Failed")
 
 
