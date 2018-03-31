@@ -1,4 +1,6 @@
-import bot
+from utils import get_users
+
+
 class Command(object):
     def __init__(self, sc):
         self.sc = sc
@@ -19,7 +21,7 @@ class Command(object):
 
     def pub(self):
         print("Triggered pub")
-        for user in bot.get_users():
+        for user in get_users(self.sc):
             print(f"Username: {user.get('name')} with ID: {user.get('id')}")
             channel = self.sc.api_call("conversations.open",
                                        users=[user.get('id')])

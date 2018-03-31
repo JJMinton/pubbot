@@ -1,9 +1,9 @@
 import time
 import event
-import os
 from slackclient import SlackClient
 
 import config
+from utils import get_users
 
 class Bot(object):
     def __init__(self):
@@ -21,7 +21,7 @@ class Bot(object):
         api_call = self.slack_client.api_call("users.list")
         if api_call.get('ok'):
             # retrieve all users so we can find our bot
-            users = api_call.get('members')
+            users = get_users(self.slack_client)
             for user in users:
                 if 'name' in user and user.get('name') == self.bot_name:
                     return "<@" + user.get('id') + ">"
@@ -37,15 +37,5 @@ class Bot(object):
             exit("Error, Connection Failed")
 
 
-def get_users():
-    # TODO: Filter out bots
-    slack_client = SlackClient(os.environ.get('SLACK_BOT_TOKEN'))
-    api_call = slack_client.api_call("users.list")
-    if api_call.get('ok'):
-        # retrieve all users so we can find our bot
-        users = api_call.get('members')
-        return users
-    else:
-        print("Failed to get users")
-        print(api_call.keys())
-        return []
+if __name__ == "__main__":
+    Bot()
