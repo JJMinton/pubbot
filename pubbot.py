@@ -26,7 +26,7 @@ class Bot(object):
             users = get_users(self.slack_client)
             for user in users:
                 if 'name' in user and user.get('name') == self.bot_name:
-                    return "<@" + user.get('id') + ">"
+                    return user.get('id')
             raise ValueError('The token does not match self.bot_name')
 
     # Listens for events being parsed
@@ -49,11 +49,18 @@ class Bot(object):
             #Check if its a direct message to the bot
             #or its @pubbot
             #If true pass to trigger node
-            if event and 'text' in event and self.bot_id in event['text']:
+            #self.bot_id in event['text']
+            #event['text'].split(self.bot_id)[1].strip().lower(),
+            print(event)
+            print(self.bot_id)
+            if event and 'text' in event and event['user']!=self.bot_id:
+                print(event['text'])
                 command = Command(self.slack_client)
                 command.handle_command(event['user'],
-                                       event['text'].split(self.bot_id)[1].strip().lower(),
+                                       event['text'],
                                        event['channel'])
+                #TODO: maybe want to send a reminder if no response after a certain
+                #amount of time
             else:
                 blog.info("Event not a message to bot")
 
