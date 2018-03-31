@@ -4,22 +4,22 @@ from utils import get_users
 class Command(object):
     def __init__(self, sc):
         self.sc = sc
-        self.commands = {
-            "pub" : self.pub,
-            "help" : self.help
-        }
+        self.trigger_keywords = ["pub", "drink", "pint", "thirsty"]
+        #self.commands = {
+        #    "pub" : self.pub,
+        #    "help" : self.help
+        #}
 
     def handle_command(self, user, command):
-        response = ""
 
-        if command in self.commands:
-            response += self.commands[command]()
-        else:
-            response += "Sorry I don't understand the command"
+        for word in self.trigger_keywords:
+            if word in command:
+                self.trigger()
+                return ""
 
-        return response
+        return "Sorry I don't understand the command"
 
-    def pub(self):
+    def trigger(self):
         print("Triggered pub")
         for user in get_users(self.sc):
             print(f"Username: {user.get('name')} with ID: {user.get('id')}")

@@ -1,5 +1,4 @@
 def get_users(sc):
-    # TODO: Filter out bots
     api_call = sc.api_call("users.list")
     if api_call.get('ok'):
         # retrieve all users so we can find our bot
