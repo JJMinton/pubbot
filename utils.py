@@ -1,9 +1,18 @@
-def get_users(sc):
-    api_call = sc.api_call("users.list")
+from loggers import blog
+
+def get_users(slack_client):
+    api_call = slack_client.api_call("users.list")
     if api_call.get('ok'):
         # retrieve all users so we can find our bot
         users = api_call.get('members')
         return users
     else:
-        print("Failed to get users")
+        blog.info("Failed to get users")
         return []
+
+def get_username_from_id(userid, users):
+    for user in users:
+       if user['id'] == userid:
+           return user['name']
+    blog.warn(f"No username for: {user['id']}")
+    return ""

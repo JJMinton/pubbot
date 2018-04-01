@@ -1,4 +1,4 @@
-from utils import get_users
+from utils import get_users, get_username_from_id
 from loggers import blog
 
 
@@ -15,7 +15,7 @@ class Command(object):
 
         for word in self.trigger_keywords:
             if word in command:
-                self.trigger(channel)
+                self.trigger(user, channel)
                 return
 
         response =  "Sorry I don't understand the command"
@@ -25,14 +25,20 @@ class Command(object):
                                    as_user=True)
         return
 
-    def trigger(self, channel):
+    def trigger(self, user, channel):
         blog.debug("Triggered pub")
 
+        users = get_users(self.slack_client)
         if channel[0] != "D":
-            print("message not in direct message")
+            response = "<@" + str(get_username_from_id(user, users)) + "> Let's move to diect messages to organise this pub trip."
+            self.slack_client.api_call("chat.postMessage",
+                                       channel=channel,
+                                       text=response,
+                                       as_user=True)
+
 
         #Talks to slackbot but no other bots
-        for user in get_users(self.slack_client):
+        for user in users:
             blog.debug(f"Username: {user.get('name')} with ID: {user.get('id')}")
             channel = self.slack_client.api_call("conversations.open",
                                                  users=[user.get('id')])
