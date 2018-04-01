@@ -6,19 +6,18 @@ class Command(object):
     def __init__(self, slack_client):
         self.slack_client = slack_client
         self.trigger_keywords = ["hello", "pub", "drink", "pint", "thirsty"]
-        #self.commands = {
-        #    "pub" : self.pub,
-        #    "help" : self.help
-        #}
 
     def handle_command(self, user, command, channel):
-
+        # Triggers pubbot if words in command are trigger words
         for word in self.trigger_keywords:
             if word in command:
                 self.trigger(user, channel)
                 return
 
-        response =  "Sorry I don't understand the command"
+        # If message doesn't contain key words
+        response =  "Sorry I don't understand the command.  Keywords are: "
+        for word in self.trigger_keywords:
+            response += word + ", "
         self.slack_client.api_call("chat.postMessage",
                                    channel=channel,
                                    text=response,
@@ -30,12 +29,12 @@ class Command(object):
 
         users = get_users(self.slack_client)
         if channel[0] != "D":
-            response = "<@" + str(get_username_from_id(user, users)) + "> Let's move to diect messages to organise this pub trip."
+            response = "<@" + str(get_username_from_id(user, users))\
+                       + "> Let's move to diect messages to organise this pub trip."
             self.slack_client.api_call("chat.postMessage",
                                        channel=channel,
                                        text=response,
                                        as_user=True)
-
 
         #Talks to slackbot but no other bots
         for user in users:
