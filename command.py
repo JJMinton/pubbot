@@ -15,7 +15,8 @@ class Command(object):
                 return
 
         # If message doesn't contain key words
-        response =  "Sorry I don't understand the command.  Keywords are: "
+        response =  "Sorry I don't understand the command. " \
+                    +  "To trigger pubbot use the following keywords: "
         for word in self.trigger_keywords:
             response += word + ", "
         self.slack_client.api_call("chat.postMessage",
