@@ -15,7 +15,7 @@ class Command(object):
 
         for word in self.trigger_keywords:
             if word in command:
-                self.trigger()
+                self.trigger(channel)
                 return
 
         response =  "Sorry I don't understand the command"
@@ -25,8 +25,12 @@ class Command(object):
                                    as_user=True)
         return
 
-    def trigger(self):
+    def trigger(self, channel):
         blog.debug("Triggered pub")
+
+        if channel[0] != "D":
+            print("message not in direct message")
+
         #Talks to slackbot but no other bots
         for user in get_users(self.slack_client):
             blog.debug(f"Username: {user.get('name')} with ID: {user.get('id')}")
