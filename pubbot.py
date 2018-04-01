@@ -46,21 +46,16 @@ class Bot(object):
     def handle_events(self, events):
         for event in events:
             blog.debug("Triggered an event")
-            #Check if its a direct message to the bot
-            #or its @pubbot
-            #If true pass to trigger node
-            #self.bot_id in event['text']
-            #event['text'].split(self.bot_id)[1].strip().lower(),
-            print(event)
-            print(self.bot_id)
+
+            # Handles event if a message from user to bot either in channel
+            # or direct message
             if event and 'text' in event and event['user']!=self.bot_id:
-                print(event['text'])
                 command = Command(self.slack_client)
                 command.handle_command(event['user'],
                                        event['text'],
                                        event['channel'])
-                #TODO: maybe want to send a reminder if no response after a certain
-                #amount of time
+                # TODO: maybe want to send a reminder if no response after a
+                # certain amount of time
             else:
                 blog.info("Event not a message to bot")
 
