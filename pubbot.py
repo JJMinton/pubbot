@@ -4,7 +4,7 @@ from slackclient import SlackClient
 import config
 from utils import get_users
 from loggers import blog
-from trigger_node import TriggerMessageNode
+from trigger_node import trigger_node_factory
 
 class Bot(object):
     def __init__(self):
@@ -43,7 +43,6 @@ class Bot(object):
 
     def handle_events(self, events):
         for event in events:
-            blog.debug("Triggered an event")
             # TODO: not from any bot
             if 'text' in event and 'user' in event and event['user']!=self.bot_id:
                 if 'channel' in event and event['channel']:
@@ -55,12 +54,10 @@ class Bot(object):
                                                                   event['text'])
                     else:
                         blog.info("Using default handler.")
-                        self.handlers[channel] = TriggerMessageNode(self.slack_client, channel)
+                        self.handlers[channel] = trigger_node_factory(self, channel)
                         self.handlers[channel] = \
                             self.handlers[channel].handle_message(event['user'],
                                                                   event['text'])
-            else:
-                blog.debug("Event not a message to bot")
 
 
 if __name__ == "__main__":

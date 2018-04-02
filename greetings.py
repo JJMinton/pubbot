@@ -5,30 +5,35 @@ from conversation_node import DirectMessageNode
 
 # node_structure: (bot_message, {user_response1: (next_node1, bot_repsonse1), user_response2: next_node2, ...})
 
+
 congrats = (['Thats great to hear'],
-            {'.*': (None, "I've run out of conversation, bye.")}
+            {'.*': (["I've run out of conversation, bye."], None)}
             )
+congrats_nf = lambda bot, user, channel: DirectMessageNode(bot, channel, *congrats)
 
 comiserations = (['Im sorry to hear that'],
-                 {'.*': (None, "I've run out of conversation, bye.")}
+                 {'.*': (["I've run out of conversation, bye."], None)}
                  )
+comiserations_nf = lambda bot, user, channel: DirectMessageNode(bot, channel, *comiserations)
 
 hows_my_day = (['Great, I guess. How was yours?',
                 'Not bad but been better, you?',
                 'Frankly, pretty rubbish. Yours better?',
                 ],
-               {'.*(good|great|excellent).*': congrats,
-                '.*(bad|terrible|rubbish|wors.*).*': comiserations,
+               {'.*(good|great|excellent).*': congrats_nf,
+                '.*(bad|terrible|rubbish|wors.*).*': comiserations_nf,
                 'do.*worry.*': None,
                 }
                )
+hows_my_day_nf = lambda bot, user, channel: DirectMessageNode(bot, channel, *hows_my_day)
 
 hows_your_day = (['Hows your day?'],
-                 {'.*(good|great|excellent).*': congrats,
-                  '.*(bad|terrible|rubbish|wors.*).*': comiserations,
+                 {'.*(good|great|excellent).*': congrats_nf,
+                  '.*(bad|terrible|rubbish|wors.*).*': comiserations_nf,
                   'do.*worry.*': None,
                   }
                  )
+hows_your_day_nf = lambda bot, user, channel: DirectMessageNode(bot, channel, *hows_your_day)
 
 hello = (['Hi!',
           'Hello...',
@@ -37,9 +42,8 @@ hello = (['Hi!',
           'Welcome',
           ],
          {
-          'h(i|ello|ey)': hows_your_day,
-          '.*how.*day.*': hows_my_day,
+          'h(i|ello|ey)': hows_your_day_nf,
+          '.*how.*day.*': hows_my_day_nf,
           }
          )
-
-greetings_factory = lambda slack_client, channel: DirectMessageNode(slack_client, channel, hello[1], hello[0])
+greetings_factory = lambda bot, user, channel: DirectMessageNode(bot, channel, *hello)

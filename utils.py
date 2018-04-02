@@ -16,3 +16,9 @@ def get_username_from_id(userid, users):
            return user['name']
     blog.warn(f"No username for: {user['id']}")
     return ""
+
+def post_message_to_channel(slack_client, channel, message):
+    slack_client.api_call("chat.postMessage",
+                          channel=channel,
+                          text=message,
+                          as_user=True)
