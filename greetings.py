@@ -3,12 +3,14 @@ import random
 
 from conversation_node import DirectMessageNode
 
+# node_structure: (bot_message, {user_response1: (next_node1, bot_repsonse1), user_response2: next_node2, ...})
+
 congrats = (['Thats great to hear'],
-            {'.*': None}
+            {'.*': (None, "I've run out of conversation, bye.")}
             )
 
 comiserations = (['Im sorry to hear that'],
-                 {'.*': None}
+                 {'.*': (None, "I've run out of conversation, bye.")}
                  )
 
 hows_my_day = (['Great, I guess. How was yours?',

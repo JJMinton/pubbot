@@ -43,16 +43,18 @@ class Bot(object):
 
     def handle_events(self, events):
         for event in events:
-            blog.info("Triggered an event")
+            blog.debug("Triggered an event")
             # TODO: not from any bot
             if 'text' in event and 'user' in event and event['user']!=self.bot_id:
                 if 'channel' in event and event['channel']:
                     channel = event['channel']
+                    blog.debug(f"Received: {event['text']}")
                     if channel in self.handlers.keys() and self.handlers[channel]:
                         self.handlers[channel] = \
                             self.handlers[channel].handle_message(event['user'],
-                                                                           event['text'])
+                                                                  event['text'])
                     else:
+                        blog.info("Using default handler.")
                         self.handlers[channel] = TriggerMessageNode(self.slack_client, channel)
                         self.handlers[channel] = \
                             self.handlers[channel].handle_message(event['user'],
