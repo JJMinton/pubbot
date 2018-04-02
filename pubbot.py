@@ -4,7 +4,7 @@ from slackclient import SlackClient
 import config
 from utils import get_users
 from loggers import blog
-from command import Command
+from trigger_node import TriggerMessageNode
 
 class Bot(object):
     def __init__(self):
@@ -41,26 +41,24 @@ class Bot(object):
             blog.error("Connection failed: exiting")
             exit("Error, Connection Failed")
 
-    # Checks to see if a message has been sent to pubbot
     def handle_events(self, events):
         for event in events:
-            blog.debug("Triggered an event")
-
-            # Handles event if a message from user to bot either in channel
-            # or direct message
+            blog.info("Triggered an event")
+            # TODO: not from any bot
             if 'text' in event and 'user' in event and event['user']!=self.bot_id:
-                #If DM and DMHandler run DMHandler
-                if 'channel' in event and self.handlers[event['channel']]:
-                    self.handlers[event['channel']] = self.handlers[event['channel']].process_message(event['user'], event['text'])
-                #else:
-                #    command = Command(self.slack_client)
-                #    command.handle_command(event['user'],
-                #                           event['text'],
-                #                           event['channel'])
-                # TODO: maybe want to send a reminder if no response after a
-                # certain amount of time
+                if 'channel' in event and event['channel']:
+                    channel = event['channel']
+                    if channel in self.handlers.keys() and self.handlers[channel]:
+                        self.handlers[channel] = \
+                            self.handlers[channel].handle_message(event['user'],
+                                                                           event['text'])
+                    else:
+                        self.handlers[channel] = TriggerMessageNode(self.slack_client, channel)
+                        self.handlers[channel] = \
+                            self.handlers[channel].handle_message(event['user'],
+                                                                  event['text'])
             else:
-                blog.info("Event not a message to bot")
+                blog.debug("Event not a message to bot")
 
 
 if __name__ == "__main__":

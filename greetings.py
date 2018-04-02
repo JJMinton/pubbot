@@ -3,8 +3,6 @@ import random
 
 from conversation_node import DirectMessageNode
 
-
-
 congrats = (['Thats great to hear'],
             {'.*': None}
             )
@@ -23,14 +21,13 @@ hows_my_day = (['Great, I guess. How was yours?',
                 }
                )
 
-
-hows_your_day = (['Hows your day'],
+hows_your_day = (['Hows your day?'],
                  {'.*(good|great|excellent).*': congrats,
                   '.*(bad|terrible|rubbish|wors.*).*': comiserations,
                   'do.*worry.*': None,
                   }
                  )
-                    
+
 hello = (['Hi!',
           'Hello...',
           "G'day",

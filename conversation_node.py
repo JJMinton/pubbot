@@ -1,38 +1,40 @@
 import datetime
+import random
 
 from utils import get_users
 from loggers import blog
 
-# structure: (message, {response1: next_node1, response2: next_node2, ...})
-
+# node_structure: (bot_message, {user_response1: (next_node1, bot_repsonse1), user_response2: next_node2, ...})
 
 class DirectMessageNode(object):
 
-    def __init__(self, slack_client, channel, choices, message="", bail_out=None):
+    def __init__(self, slack_client, channel,
+                 user_responses, bot_message=[""], bail_out=None):
         self._slack_client = slack_client
         self._channel = channel
-        self.respond(random.choice(message))
-        self._last_response = datetime.now()
+        self._last_response = datetime.datetime.now()
 
-        self.choices = choices
+        self.user_responses = user_responses
         self.bail_out_option = bail_out or self
 
-    def process_message(self, user, message):
-        for choice in choices:
-            if re.search(choice, message, re.IGNORECASE):
-                if len(choices[choice]) > 2:
-                    choices[choice][2](self)
-                if len(choices[choice]) > 1:
-                    return DirectMessageNode(self._slack_client,
-                                             self._channel,
-                                             choices[choice][1],
-                                             choices[choice][0],
-                                             self.bail_out_option)
-                return
-        self.respond("Sorry, I don't know what to say.")
+        self.post_message(random.choice(bot_message))
+
+    def handle_message(self, user, user_message):
+        for response in self.user_responses:
+                if not isinstance(self.user_responses[response], tuple):
+                    self.user_responses[response] = (self.user_responses[response],)
+                if len(self.user_responses[response]) > 1:
+                    self.post_message(self.user_responses[response][1])
+                return DirectMessageNode(self._slack_client,
+                                         self._channel,
+                                         self.user_responses[response][0][1],
+                                         self.user_responses[response][0][0],
+                                         self.bail_out_option)
+        # TODO: add generic exit options
+        self.post_message("Sorry, I don't know what to say.")
         return self.bail_out_option
 
-    def respond(self, message):
+    def post_message(self, message):
         self._slack_client.api_call("chat.postMessage",
                                     channel=self._channel,
                                     text=message,
