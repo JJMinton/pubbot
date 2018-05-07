@@ -15,13 +15,18 @@ def choose_pub_factory(bot, original_user, original_channel):
                    + f"with ID: {user.get('id')}")
         channel = bot.slack_client.api_call("conversations.open",
                                             users=[user.get('id')])
-        if channel['ok']:
-            channel = channel['channel']['id']
-            #TODO: don't set original_user's handler
-            bot.handlers[channel] = DirectMessageNode(bot, channel, ['Fancy a pint?'], {'.*': (['Cool'], None)})
+        if channel['ok'] and 'channel' in channel and 'id' in channel['channel'] and channel['channel']['id'] != original_channel:
+            channel_id = channel['channel']['id']
+            bot.handlers[channel_id] \
+                = DirectMessageNode(bot, channel_id,
+                                    ['Fancy a pint?'],
+                                    {'.*': (['Cool'], None)}
+                                   )
         else:
             blog.warn(f"Status is not ok for user: {user.get('id')}")
-    return DirectMessageNode(bot, original_channel, ["I've messaged everyone for you"], {'.*': (['Have a good time'], None)})
+    return DirectMessageNode(bot, original_channel,
+                             ["I've messaged everyone for you"],
+                             {'.*': (['Have a good time'], None)})
 
 pub = (["Fancy a pint?",
         "Do you want to go to the pub?",
@@ -40,7 +45,7 @@ pub = (["Fancy a pint?",
         '.*n(o|ot\s+today|ah).*': (
                                    ["We'll miss you.",
                                     "Maybe next time?",
-                                    "Your loss"
+                                    "Your loss."
                                     ],
                                     None
                                    ),
