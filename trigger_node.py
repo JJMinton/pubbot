@@ -6,14 +6,13 @@ from greetings import greetings_factory
 from pub import pub_trip_factory
 
 
-
 def trigger_conversation(bot, user, channel):
     if channel[0] == "D":
         return greetings_factory(bot, user, channel)
     else:
         user_name = get_username_from_id(user, get_users(bot.slack_client))
         post_message_to_channel(bot.slack_client, channel,
-                                f"<@ {user_name}> I'll message you.")
+                                f"<@{user_name}> I'll message you.")
         # Talks to user who posted
         dmchannel = bot.slack_client.api_call("conversations.open",
                                               users=[user])
@@ -50,10 +49,11 @@ def trigger_pub(bot, user, channel):
 
 
 trigger_keywords = ["pub", "pint", "thirst", "drink"]
+
 trigger_node_factory = lambda bot, channel: DirectMessageNode(bot, channel, user_responses={
-                                                "hello": trigger_conversation,
-                                                ".*("+"|".join(trigger_keywords)+").*": trigger_pub,
-                                                ".*": (["Sorry, I don't understand you. "
-                                                       "To trigger pubbot use the following keywords: "
-                                                       +", ".join(trigger_keywords)], None)
-                                                })
+    ".*(" + "h(i|ello|ey)" + ").*": trigger_conversation,
+    ".*("+"|".join(trigger_keywords)+").*": trigger_pub,
+    ".*": (["Sorry, I don't understand you. "
+            "To trigger pubbot use the following keywords: "
+            +", ".join(trigger_keywords)], None)
+})

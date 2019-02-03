@@ -11,7 +11,8 @@ from loggers import mlog
 gmaps = googlemaps.Client(google_api_key)
 
 
-def get_pub_suggestions(location, number=3, maximum_distance=None, initial_distance=50):
+def get_pub_suggestions(location, number=3, maximum_distance=None,
+                        initial_distance=50):
     suggestions = []
     radius = initial_distance
     while len(suggestions) < number:
@@ -35,11 +36,6 @@ def get_pub_suggestions(location, number=3, maximum_distance=None, initial_dista
     print(f"{res.keys()}")
     return suggestions
 
-
-
-
-
-
 def get_location(location_string):
 
     location = gmaps.places(location_string)
@@ -56,6 +52,6 @@ def get_location(location_string):
         raise
 
 if __name__ == "__main__":
-    location = get_location("36 King street, Covent Garden")
-
+    #location = get_location("36 King street, Covent Garden")
+    location = get_location("GU25 4HU")
     suggestions = get_pub_suggestions(location, maximum_distance=201, number=5)

@@ -2,12 +2,13 @@ import re
 import random
 
 from conversation_node import DirectMessageNode
+from pub import pub_trip_factory
 
 # node_structure: (bot_message, {user_response1: (next_node1, bot_repsonse1), user_response2: next_node2, ...})
 
 
 congrats = (['Thats great to hear'],
-            {'.*': (["I've run out of conversation, bye."], None)}
+            {'.*': pub_trip_factory}
             )
 congrats_nf = lambda bot, user, channel: DirectMessageNode(bot, channel, *congrats)
 
@@ -20,8 +21,8 @@ hows_my_day = (['Great, I guess. How was yours?',
                 'Not bad but been better, you?',
                 'Frankly, pretty rubbish. Yours better?',
                 ],
-               {'.*(good|great|excellent).*': congrats_nf,
-                '.*(bad|terrible|rubbish|wors.*).*': comiserations_nf,
+               {'.*(yes|good|great|excellent).*': congrats_nf,
+                '.*(no|bad|terrible|rubbish|wors.*).*': comiserations_nf,
                 'do.*worry.*': None,
                 }
                )

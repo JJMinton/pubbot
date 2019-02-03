@@ -5,17 +5,18 @@ import re
 from utils import get_users
 from loggers import blog
 
-# node_structure: (bot_message, {user_response1: (bot_repsonse1, next_node1), user_response2: next_node2, ...})
+# node_structure: (bot_message, {user_response1: (action_for_bot1, next_node1), user_response2: next_node2, ...})
 # where next_nodex is a factory function or a class
 
-class DirectMessageNode(object):
+class ActionNode(object):
 
-    def __init__(self, bot, channel,
+    def __init__(self, bot, channel, action,
                  bot_message=[""], user_responses={},
                  bail_out=None):
         self.bot = bot
         self.slack_client = bot.slack_client
         self.channel = channel
+        self.action = action
         self.last_response = datetime.datetime.now()
 
         self.user_responses = user_responses
@@ -27,8 +28,9 @@ class DirectMessageNode(object):
     def handle_message(self, user, user_message):
         for response in self.user_responses:
             if re.search(response, user_message, re.IGNORECASE):
-                if self.user_responses[response] and isinstance(self.user_responses[response], (list, tuple)): # TODO: use group
-                    self.post_message(random.choice(self.user_responses[response][0]))
+                if self.user_responses[response] and isinstance(self.user_responses[response], (func, tuple)): # TODO: use group
+                    something_to_speak = user_response[response][0](user, usermessage)
+                    self.post_message(something_to_speak)
                     next_node = self.user_responses[response][1]
                 else:
                     next_node = self.user_responses[response]

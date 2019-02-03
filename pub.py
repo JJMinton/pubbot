@@ -4,8 +4,9 @@ import random
 from loggers import blog
 from utils import get_users
 from conversation_node import DirectMessageNode
+from location import location_factory
 
-# node_structure: (bot_message, {user_response1: (next_node1, bot_repsonse1), user_response2: next_node2, ...})
+# node_structure: (bot_message, {user_response1: (bot_repsonse1, next_node1), user_response2: next_node2, ...})
 
 def choose_pub_factory(bot, original_user, original_channel):
     #Talks to slackbot but no other bots
@@ -15,7 +16,10 @@ def choose_pub_factory(bot, original_user, original_channel):
                    + f"with ID: {user.get('id')}")
         channel = bot.slack_client.api_call("conversations.open",
                                             users=[user.get('id')])
-        if channel['ok'] and 'channel' in channel and 'id' in channel['channel'] and channel['channel']['id'] != original_channel:
+        if (channel['ok']
+                and 'channel' in channel
+                and 'id' in channel['channel']
+                and channel['channel']['id'] != original_channel):
             channel_id = channel['channel']['id']
             bot.handlers[channel_id] \
                 = DirectMessageNode(bot, channel_id,
@@ -24,9 +28,12 @@ def choose_pub_factory(bot, original_user, original_channel):
                                    )
         else:
             blog.warn(f"Status is not ok for user: {user.get('id')}")
+    #Print I've messaged everyone for you.
     return DirectMessageNode(bot, original_channel,
                              ["I've messaged everyone for you"],
-                             {'.*': (['Have a good time'], None)})
+                             {'.*':location_factory})
+    #print ("Returning location factory")
+    #return location_factory
 
 pub = (["Fancy a pint?",
         "Do you want to go to the pub?",
